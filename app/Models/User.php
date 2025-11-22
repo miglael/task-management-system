@@ -6,6 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Assignment;
+use App\Models\Submission;
+
 
 class User extends Authenticatable
 {
@@ -21,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,5 +48,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    /**
+     * Jika user adalah Guru -> punya banyak assignment
+     */
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'guru_id');
+    }
+
+    /**
+     * Jika user adalah Murid -> punya banyak submission
+     */
+    public function submissions()
+    {
+        return $this->hasMany(Submission::class, 'murid_id');
     }
 }
