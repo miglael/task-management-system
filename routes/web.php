@@ -18,6 +18,17 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'registerStore']);
+Route::middleware(['auth', 'role:murid'])->get('/murid/dashboard', [MuridController::class, 'dashboard']);
+Route::middleware(['auth', 'role:murid'])->get('/murid/profile', [MuridController::class, 'profile'])->name('murid.profile');
+Route::middleware(['auth', 'role:murid'])->group(function () {
+
+    Route::get('/murid/profile/edit', [MuridController::class, 'editProfile'])
+    ->middleware(['auth', 'role:murid'])
+    ->name('murid.profile.edit');
+
+    Route::post('/murid/profile/update', [MuridController::class, 'updateProfile'])->name('murid.profile.update');
+
+});
 
 
 /*
