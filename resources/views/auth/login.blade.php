@@ -48,6 +48,9 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    <p class="mb-0 mt-3 text-center">
+                        <a href="{{ url('/register') }}" class="text-center">Belum punya akun? Register</a>
+                    </p>
                 </form>
 
             </div>
