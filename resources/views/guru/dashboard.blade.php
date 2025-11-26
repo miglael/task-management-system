@@ -6,7 +6,6 @@
 
 <div class="row">
 
-    <!-- Total Tugas -->
     <div class="col-lg-4 col-12">
         <div class="small-box bg-primary">
             <div class="inner">
@@ -22,7 +21,6 @@
         </div>
     </div>
 
-    <!-- Total Submission -->
     <div class="col-lg-4 col-12">
         <div class="small-box bg-success">
             <div class="inner">
@@ -38,7 +36,6 @@
         </div>
     </div>
 
-    <!-- Belum Dinilai -->
     <div class="col-lg-4 col-12">
         <div class="small-box bg-warning">
             <div class="inner">

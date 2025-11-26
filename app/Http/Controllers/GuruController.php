@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
-    // Dashboard Guru
     public function index()
     {
         $guruId = Auth::id();
@@ -65,7 +64,6 @@ class GuruController extends Controller
             $user->password = bcrypt($request->password);
         }
 
-        // Upload Foto
         if ($request->hasFile('photo')) {
 
             if ($user->photo && file_exists(storage_path('app/public/' . $user->photo))) {
@@ -81,23 +79,17 @@ class GuruController extends Controller
         return redirect()->route('guru.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
-
-    // LIST tugas guru
     public function assignments()
     {
         $assignments = Assignment::where('guru_id', Auth::id())->get();
         return view('guru.assignments.index', compact('assignments'));
     }
 
-
-    // FORM create tugas
     public function create()
     {
         return view('guru.assignments.create');
     }
 
-
-    // SIMPAN tugas baru
     public function store(Request $request)
     {
         $request->validate([
@@ -119,16 +111,12 @@ class GuruController extends Controller
         return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil dibuat!');
     }
 
-
-    // FORM edit tugas
     public function edit($id)
     {
         $assignment = Assignment::findOrFail($id);
         return view('guru.assignments.edit', compact('assignment'));
     }
 
-
-    // UPDATE tugas
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -152,16 +140,12 @@ class GuruController extends Controller
         return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil diperbarui!');
     }
 
-
-    // DELETE tugas
     public function destroy($id)
     {
         Assignment::findOrFail($id)->delete();
         return back()->with('success', 'Tugas berhasil dihapus!');
     }
 
-
-    // LIST submission untuk satu tugas
     public function submissions($id)
     {
         $assignment = Assignment::findOrFail($id);
@@ -171,8 +155,6 @@ class GuruController extends Controller
         return view('guru.assignments.submissions', compact('assignment', 'submissions'));
     }
 
-
-    // GURU memberi nilai
     public function gradeSubmission(Request $request, $id)
     {
         $request->validate([

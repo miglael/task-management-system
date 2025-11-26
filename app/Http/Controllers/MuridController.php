@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class MuridController extends Controller
 {
-    // Dashboard murid → daftar assignment
     public function index()
     {
         $assignments = Assignment::orderBy('deadline', 'asc')->get();
@@ -24,7 +23,6 @@ class MuridController extends Controller
         $submitted = Submission::where('murid_id', $muridId)->count();
         $pending = $totalAssignments - $submitted;
 
-        // Ambil 5 tugas terbaru
         $latestAssignments = Assignment::orderBy('deadline', 'asc')->take(5)->get();
 
         return view('murid.dashboard', [
@@ -37,21 +35,18 @@ class MuridController extends Controller
 
     public function profile()
     {
-        // $user = auth()->user();
         $user = Auth::user();
         return view('murid.profile', compact('user'));
     }
 
     public function editProfile()
     {
-        // $user = auth()->user();
         $user = Auth::user();
         return view('murid.profile_edit', compact('user'));
     }
 
     public function updateProfile(Request $request)
     {
-        // $user = auth()->user();
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
@@ -62,7 +57,6 @@ class MuridController extends Controller
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // Update basic data
         $user->name = $request->name;
         $user->email = $request->email;
 
@@ -70,10 +64,8 @@ class MuridController extends Controller
             $user->password = bcrypt($request->password);
         }
 
-        // Upload file
         if ($request->hasFile('photo')) {
 
-            // Hapus foto lama jika ada
             if ($user->photo && file_exists(storage_path('app/public/' . $user->photo))) {
                 unlink(storage_path('app/public/' . $user->photo));
             }
@@ -87,8 +79,6 @@ class MuridController extends Controller
         return redirect()->route('murid.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
-
-    // Form submit tugas
     public function submit($id)
     {
         $assignment = Assignment::findOrFail($id);
@@ -116,12 +106,10 @@ class MuridController extends Controller
             ->where('murid_id', Auth::id())
             ->firstOrFail();
 
-        // Hapus file lama
         if ($submission->file_path && file_exists(storage_path('app/' . $submission->file_path))) {
             unlink(storage_path('app/' . $submission->file_path));
         }
 
-        // Upload baru
         $submission->file_path = $request->file('file')->store('submissions', 'public');
         $submission->submitted_at = now();
         $submission->save();
@@ -136,24 +124,18 @@ class MuridController extends Controller
             ->where('murid_id', Auth::id())
             ->firstOrFail();
 
-        // Path yang benar untuk disk 'public'
         $filePath = storage_path('app/public/' . $submission->file_path);
 
-        // Hapus file jika ada
         if (file_exists($filePath)) {
             unlink($filePath);
         }
 
-        // Hapus record dari database
         $submission->delete();
 
         return redirect()->route('murid.assignments')
             ->with('success', 'Submission berhasil dihapus!');
     }
 
-
-
-    // Simpan submission murid
     public function storeSubmission(Request $request, $id)
     {
         $request->validate([
@@ -172,7 +154,6 @@ class MuridController extends Controller
         return redirect()->route('murid.assignments')->with('success', 'Tugas berhasil dikumpulkan');
     }
 
-    // Lihat nilai tugas yang sudah dikumpulkan
     public function mySubmissions()
     {
         $submissions = Submission::where('murid_id', Auth::id())->get();
@@ -183,12 +164,10 @@ class MuridController extends Controller
     {
         $muridId = Auth::id();
 
-        // Ambil ID assignment yang sudah disubmit
         $submittedIds = Submission::where('murid_id', $muridId)
             ->pluck('assignment_id')
             ->toArray();
 
-        // Ambil assignment yang TIDAK ada dalam list submitted
         $pendingAssignments = Assignment::whereNotIn('id', $submittedIds)
             ->orderBy('deadline', 'asc')
             ->get();

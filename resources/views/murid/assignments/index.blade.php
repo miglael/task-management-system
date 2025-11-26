@@ -33,7 +33,6 @@
           <td>{{ Str::limit($a->description, 40) }}</td>
           <td>{{ $a->deadline }}</td>
 
-          <!-- STATUS -->
           <td>
             @if($submitted)
             <span class="badge badge-success">Sudah Mengumpulkan</span>
@@ -42,7 +41,6 @@
             @endif
           </td>
 
-          <!-- AKSI -->
           <td>
             @if($submitted)
 
