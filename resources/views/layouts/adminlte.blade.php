@@ -33,49 +33,56 @@
           <ul class="nav nav-pills nav-sidebar flex-column">
 
             @if(auth()->user()->role == 'guru')
-              <li class="nav-item">
-                <a href="/guru/dashboard" class="nav-link">
-                  <i class="nav-icon fas fa-home"></i>
-                  <p>Dashboard Guru</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/guru/dashboard" class="nav-link">
+                <i class="nav-icon fas fa-home"></i>
+                <p>Dashboard </p>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="/guru" class="nav-link">
-                  <i class="nav-icon fas fa-book"></i>
-                  <p>Kelola Tugas</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="{{ route('guru.profile') }}" class="nav-link">
+                <i class="nav-icon fas fa-user"></i>
+                <p>Profil Saya</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{{ route('guru.assignments') }}" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <p>Kelola Tugas</p>
+              </a>
+            </li>
             @endif
 
             @if(auth()->user()->role == 'murid')
-              <li class="nav-item">
-                <a href="/murid/dashboard" class="nav-link">
-                  <i class="nav-icon fas fa-home"></i>
-                  <p>Dashboard Murid</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/murid/dashboard" class="nav-link">
+                <i class="nav-icon fas fa-home"></i>
+                <p>Dashboard</p>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="/murid/profile" class="nav-link">
-                  <i class="nav-icon fas fa-user"></i>
-                  <p>Profil Saya</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/murid/profile" class="nav-link">
+                <i class="nav-icon fas fa-user"></i>
+                <p>Profil Saya</p>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="/murid" class="nav-link">
-                  <i class="nav-icon fas fa-book"></i>
-                  <p>Daftar Tugas</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/murid" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <p>Daftar Tugas</p>
+              </a>
+            </li>
 
-              <li class="nav-item">
-                <a href="/murid/submissions" class="nav-link">
-                  <i class="nav-icon fas fa-check"></i>
-                  <p>Tugas Saya</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/murid/submissions" class="nav-link">
+                <i class="nav-icon fas fa-check"></i>
+                <p>Tugas Saya</p>
+              </a>
+            </li>
             @endif
 
           </ul>

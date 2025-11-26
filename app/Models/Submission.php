@@ -25,6 +25,6 @@ class Submission extends Model
 
     public function murid()
     {
-        return $this->belongsTo(User::class, 'murid_id');
+        return $this->belongsTo(Assignment::class, 'assignment_id');
     }
 }

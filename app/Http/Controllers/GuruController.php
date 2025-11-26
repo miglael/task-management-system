@@ -9,95 +9,190 @@ use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
-    // Dashboard Guru: daftar assignment yang dia buat
+    // Dashboard Guru
     public function index()
+    {
+        $guruId = Auth::id();
+
+        $totalAssignments = Assignment::where('guru_id', $guruId)->count();
+
+        $totalSubmissions = Submission::whereIn(
+            'assignment_id',
+            Assignment::where('guru_id', $guruId)->pluck('id')
+        )->count();
+
+        $ungraded = Submission::whereNull('grade')
+            ->whereIn(
+                'assignment_id',
+                Assignment::where('guru_id', $guruId)->pluck('id')
+            )->count();
+
+        return view('guru.dashboard', [
+            'totalAssignments' => $totalAssignments,
+            'totalSubmissions' => $totalSubmissions,
+            'ungraded' => $ungraded,
+        ]);
+    }
+
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('guru.profile', compact('user'));
+    }
+
+    public function editProfile()
+    {
+        $user = Auth::user();
+        return view('guru.profile_edit', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6|confirmed',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->password) {
+            $user->password = bcrypt($request->password);
+        }
+
+        // Upload Foto
+        if ($request->hasFile('photo')) {
+
+            if ($user->photo && file_exists(storage_path('app/public/' . $user->photo))) {
+                unlink(storage_path('app/public/' . $user->photo));
+            }
+
+            $path = $request->file('photo')->store('photos', 'public');
+            $user->photo = $path;
+        }
+
+        $user->save();
+
+        return redirect()->route('guru.profile')->with('success', 'Profil berhasil diperbarui');
+    }
+
+
+    // LIST tugas guru
+    public function assignments()
     {
         $assignments = Assignment::where('guru_id', Auth::id())->get();
         return view('guru.assignments.index', compact('assignments'));
     }
 
-    // Form create assignment
+
+    // FORM create tugas
     public function create()
     {
         return view('guru.assignments.create');
     }
 
-    // Simpan assignment baru
+
+    // SIMPAN tugas baru
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title'      => 'required',
             'description' => 'required',
-            'deadline' => 'required|date',
+            'deadline_date' => 'required|date',
+            'deadline_time' => 'required',
         ]);
+
+        $deadline = $request->deadline_date . ' ' . $request->deadline_time . ':00';
 
         Assignment::create([
-            'title' => $request->title,
+            'title'       => $request->title,
             'description' => $request->description,
-            'deadline' => $request->deadline,
-            'guru_id' => Auth::id(),
+            'deadline'    => $deadline,
+            'guru_id'     => Auth::id(),
         ]);
 
-        return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil dibuat');
+        return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil dibuat!');
     }
 
-    // Edit Assignment
+
+    // FORM edit tugas
     public function edit($id)
     {
         $assignment = Assignment::findOrFail($id);
         return view('guru.assignments.edit', compact('assignment'));
     }
 
+
+    // UPDATE tugas
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'deadline' => 'required|date',
+            'title'          => 'required|string',
+            'description'    => 'required|string',
+            'deadline_date'  => 'required|date',
+            'deadline_time'  => 'required',
         ]);
 
         $assignment = Assignment::findOrFail($id);
 
+        // Gabungkan tanggal + jam
+        $deadline = $request->deadline_date . ' ' . $request->deadline_time . ':00';
+
         $assignment->update([
-            'title' => $request->title,
+            'title'       => $request->title,
             'description' => $request->description,
-            'deadline' => $request->deadline,
+            'deadline'    => $deadline,
         ]);
 
-        return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil diperbarui');
+        return redirect()->route('guru.assignments')->with('success', 'Tugas berhasil diperbarui!');
     }
 
-    // Hapus assignment
+
+    // DELETE tugas
     public function destroy($id)
     {
         Assignment::findOrFail($id)->delete();
-        return redirect()->back();
+        return back()->with('success', 'Tugas berhasil dihapus!');
     }
 
-    // Melihat submissions untuk satu assignment
+
+    // LIST submission untuk satu tugas
     public function submissions($id)
     {
         $assignment = Assignment::findOrFail($id);
-        $submissions = $assignment->submissions;
+
+        $submissions = Submission::where('assignment_id', $id)->get();
 
         return view('guru.assignments.submissions', compact('assignment', 'submissions'));
     }
 
-    // Memberi nilai & feedback
+
+    // GURU memberi nilai
     public function gradeSubmission(Request $request, $id)
     {
         $request->validate([
-            'grade' => 'required|integer',
-            'feedback' => 'nullable|string'
+            'grade' => 'required|numeric|min:0|max:100',
         ]);
 
         $submission = Submission::findOrFail($id);
 
-        $submission->update([
-            'grade' => $request->grade,
-            'feedback' => $request->feedback,
-        ]);
+        $submission->grade = $request->grade;
+        $submission->save();
 
-        return back()->with('success', 'Nilai berhasil diberikan');
+        return redirect()->route('guru.assignment.submissions', $submission->assignment_id)
+            ->with('success', 'Nilai berhasil diberikan!');
+    }
+
+    public function gradePage($id)
+    {
+        $submission = Submission::findOrFail($id);
+        $assignment = $submission->assignment;
+
+        return view('guru.assignments.grade', compact('submission', 'assignment'));
     }
 }
