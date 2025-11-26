@@ -18,19 +18,20 @@ class MuridController extends Controller
     }
     public function dashboard()
     {
-        // $muridId = auth()->id();
         $muridId = Auth::id();
 
         $totalAssignments = Assignment::count();
-
         $submitted = Submission::where('murid_id', $muridId)->count();
-
         $pending = $totalAssignments - $submitted;
+
+        // Ambil 5 tugas terbaru
+        $latestAssignments = Assignment::orderBy('deadline', 'asc')->take(5)->get();
 
         return view('murid.dashboard', [
             'totalAssignments' => $totalAssignments,
             'submitted' => $submitted,
             'pending' => $pending,
+            'latestAssignments' => $latestAssignments,
         ]);
     }
 
@@ -176,5 +177,22 @@ class MuridController extends Controller
     {
         $submissions = Submission::where('murid_id', Auth::id())->get();
         return view('murid.assignments.mysubmissions', compact('submissions'));
+    }
+
+    public function pendingAssignments()
+    {
+        $muridId = Auth::id();
+
+        // Ambil ID assignment yang sudah disubmit
+        $submittedIds = Submission::where('murid_id', $muridId)
+            ->pluck('assignment_id')
+            ->toArray();
+
+        // Ambil assignment yang TIDAK ada dalam list submitted
+        $pendingAssignments = Assignment::whereNotIn('id', $submittedIds)
+            ->orderBy('deadline', 'asc')
+            ->get();
+
+        return view('murid.assignments.pending', compact('pendingAssignments'));
     }
 }

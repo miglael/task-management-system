@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Submission extends Model
 {
@@ -25,6 +26,7 @@ class Submission extends Model
 
     public function murid()
     {
-        return $this->belongsTo(Assignment::class, 'assignment_id');
+        return $this->belongsTo(User::class, 'murid_id');
     }
+
 }

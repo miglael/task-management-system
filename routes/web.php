@@ -18,6 +18,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'registerStore']);
+Route::get('/murid/assignments/pending', [MuridController::class, 'pendingAssignments'])->name('murid.assignments.pending');
 
 
 /*
