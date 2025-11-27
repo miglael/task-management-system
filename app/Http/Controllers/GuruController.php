@@ -128,7 +128,6 @@ class GuruController extends Controller
 
         $assignment = Assignment::findOrFail($id);
 
-        // Gabungkan tanggal + jam
         $deadline = $request->deadline_date . ' ' . $request->deadline_time . ':00';
 
         $assignment->update([
