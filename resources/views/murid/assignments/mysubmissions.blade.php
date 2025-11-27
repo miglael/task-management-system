@@ -13,6 +13,7 @@
           <th>Judul Tugas</th>
           <th>File</th>
           <th>Tanggal Submit</th>
+          <th>Status</th>
           <th>Nilai</th>
         </tr>
       </thead>
@@ -32,6 +33,16 @@
 
           <td>{{ $s->submitted_at }}</td>
 
+          {{-- Status Tepat Waktu / Terlambat --}}
+          <td>
+            @if($s->submitted_at > $s->assignment->deadline)
+            <span class="badge bg-danger">Terlambat</span>
+            @else
+            <span class="badge bg-success">Tepat Waktu</span>
+            @endif
+          </td>
+
+          {{-- Nilai --}}
           <td>
             @if($s->grade !== null)
             <span class="badge bg-success">{{ $s->grade }}</span>
@@ -40,9 +51,10 @@
             @endif
           </td>
         </tr>
+
         @empty
         <tr>
-          <td colspan="4" class="text-center py-3">Belum ada submission</td>
+          <td colspan="5" class="text-center py-3">Belum ada submission</td>
         </tr>
         @endforelse
 
